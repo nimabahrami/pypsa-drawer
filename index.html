@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyPSA Network Drawer</title>
+  <meta name="description"
+    content="Visual network drawer for PyPSA energy systems. Draw buses, generators, loads, lines, and more. Export as PyPSA Python code or PNG.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>P</text></svg>">
+</head>
+
+<body>
+  <div id="app">
+    <!-- Toolbar -->
+    <header id="toolbar">
+      <div class="toolbar-brand">PyPSA <span>Drawer</span></div>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btn-undo" title="Undo (Ctrl+Z)">Undo</button>
+      <button class="toolbar-btn" id="btn-redo" title="Redo (Ctrl+Shift+Z)">Redo</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btn-center" title="Center View">Center</button>
+      <button class="toolbar-btn" id="btn-clear" title="Clear All">Clear</button>
+      <div class="toolbar-spacer"></div>
+      <span id="comp-count">0 components</span>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btn-export" title="Export as PNG">PNG</button>
+      <button class="toolbar-btn primary" id="btn-code" title="Generate PyPSA Code">{ } Code</button>
+    </header>
+
+    <!-- Sidebar / Component Palette -->
+    <aside id="sidebar">
+      <div id="palette-list"></div>
+    </aside>
+
+    <!-- SVG Canvas -->
+    <main id="canvas-area">
+      <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="canvas-hint">Click on the canvas to place -- Hold Shift to place multiple -- Esc to cancel</div>
+    </main>
+
+    <!-- Property Editor -->
+    <aside id="prop-panel">
+      <div id="prop-panel-content"></div>
+    </aside>
+
+    <!-- Code Output Panel -->
+    <div id="code-panel">
+      <div class="code-header">
+        <span class="code-header-title">Generated PyPSA Code</span>
+        <button class="toolbar-btn" id="btn-copy-code">Copy Code</button>
+        <button class="toolbar-btn" id="btn-close-code">Close</button>
+      </div>
+      <div class="code-body">
+        <pre id="code-output"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
