@@ -171,4 +171,113 @@ export class PropertyEditor {
             }
         });
     }
+
+    showTerritory(terr) {
+        this.currentId = null;
+        this.panel.innerHTML = '';
+        if (!terr) return;
+
+        const header = document.createElement('div');
+        header.className = 'prop-header';
+        header.innerHTML = `<span class="prop-type-badge" style="background:#cc3333;color:#fff">Territory</span>
+                            <span class="prop-name">${terr.name}</span>`;
+        this.panel.appendChild(header);
+
+        const fields = document.createElement('div');
+        fields.className = 'prop-fields';
+
+        // Name
+        const nameRow = document.createElement('div');
+        nameRow.className = 'prop-row';
+        nameRow.innerHTML = `<span class="prop-label">Name</span>`;
+        const nameInput = document.createElement('input');
+        nameInput.className = 'prop-input';
+        nameInput.type = 'text';
+        nameInput.value = terr.name;
+        nameInput.addEventListener('input', () => {
+            terr.name = nameInput.value;
+            header.querySelector('.prop-name').textContent = terr.name;
+            this.app.canvas._renderTerritory(terr);
+        });
+        nameRow.appendChild(nameInput);
+        fields.appendChild(nameRow);
+
+        // Fill Color
+        const colorRow = document.createElement('div');
+        colorRow.className = 'prop-row';
+        colorRow.innerHTML = `<span class="prop-label">Fill Color</span>`;
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = terr.fillColor || '#dc3232';
+        colorInput.style.cssText = 'width:36px;height:26px;border:1px solid var(--border-strong);border-radius:4px;cursor:pointer;padding:1px;';
+        colorInput.addEventListener('input', () => {
+            terr.fillColor = colorInput.value;
+            terr.borderColor = colorInput.value;
+            borderInput.value = colorInput.value;
+            this.app.canvas._renderTerritory(terr);
+        });
+        colorRow.appendChild(colorInput);
+        fields.appendChild(colorRow);
+
+        // Border Color
+        const borderRow = document.createElement('div');
+        borderRow.className = 'prop-row';
+        borderRow.innerHTML = `<span class="prop-label">Border Color</span>`;
+        const borderInput = document.createElement('input');
+        borderInput.type = 'color';
+        borderInput.value = terr.borderColor || '#cc3333';
+        borderInput.style.cssText = 'width:36px;height:26px;border:1px solid var(--border-strong);border-radius:4px;cursor:pointer;padding:1px;';
+        borderInput.addEventListener('input', () => {
+            terr.borderColor = borderInput.value;
+            this.app.canvas._renderTerritory(terr);
+        });
+        borderRow.appendChild(borderInput);
+        fields.appendChild(borderRow);
+
+        // Opacity
+        const opacityRow = document.createElement('div');
+        opacityRow.className = 'prop-row';
+        opacityRow.innerHTML = `<span class="prop-label">Opacity</span>`;
+        const opacityWrap = document.createElement('div');
+        opacityWrap.style.cssText = 'flex:1;display:flex;align-items:center;gap:6px;';
+        const opacitySlider = document.createElement('input');
+        opacitySlider.type = 'range';
+        opacitySlider.min = '0';
+        opacitySlider.max = '100';
+        opacitySlider.value = Math.round((terr.opacity != null ? terr.opacity : 0.08) * 100);
+        opacitySlider.style.cssText = 'flex:1;height:4px;cursor:pointer;';
+        const opacityLabel = document.createElement('span');
+        opacityLabel.style.cssText = 'font-size:10px;color:var(--text-dim);width:30px;text-align:right;font-family:var(--mono);';
+        opacityLabel.textContent = opacitySlider.value + '%';
+        opacitySlider.addEventListener('input', () => {
+            terr.opacity = parseInt(opacitySlider.value) / 100;
+            opacityLabel.textContent = opacitySlider.value + '%';
+            this.app.canvas._renderTerritory(terr);
+        });
+        opacityWrap.appendChild(opacitySlider);
+        opacityWrap.appendChild(opacityLabel);
+        opacityRow.appendChild(opacityWrap);
+        fields.appendChild(opacityRow);
+
+        this.panel.appendChild(fields);
+
+        // Delete button
+        const actions = document.createElement('div');
+        actions.className = 'prop-actions';
+        const delBtn = document.createElement('button');
+        delBtn.className = 'prop-action-btn';
+        delBtn.style.cssText = 'color:var(--danger);border-color:var(--danger);';
+        delBtn.textContent = 'Delete Territory';
+        delBtn.addEventListener('click', () => {
+            this.app.canvas.deleteTerritory(terr.id);
+        });
+        delBtn.addEventListener('mouseenter', () => {
+            delBtn.style.background = 'rgba(255,59,48,0.06)';
+        });
+        delBtn.addEventListener('mouseleave', () => {
+            delBtn.style.background = '#fff';
+        });
+        actions.appendChild(delBtn);
+        this.panel.appendChild(actions);
+    }
 }

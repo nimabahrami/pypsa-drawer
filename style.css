@@ -508,6 +508,30 @@ body {
   height: var(--code-h);
 }
 
+#code-resize-handle {
+  height: 6px;
+  cursor: ns-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+}
+
+#code-resize-handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+}
+
+#code-resize-handle:hover::after {
+  background: rgba(0, 0, 0, 0.25);
+}
+
 .code-header {
   display: flex;
   align-items: center;

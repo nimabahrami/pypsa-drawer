@@ -70,6 +70,28 @@ class App {
                 palette.appendChild(btn);
             }
         }
+
+        // Visual tools section
+        const vizHeader = document.createElement('div');
+        vizHeader.className = 'palette-category';
+        vizHeader.textContent = 'Visual';
+        palette.appendChild(vizHeader);
+
+        const terrBtn = document.createElement('button');
+        terrBtn.className = 'palette-item';
+        terrBtn.innerHTML = `<span class="palette-icon" style="font-size:11px">[ ]</span>
+                     <span class="palette-label">Territory</span>`;
+        terrBtn.addEventListener('click', () => {
+            palette.querySelectorAll('.palette-item').forEach(b => b.classList.remove('active'));
+            terrBtn.classList.add('active');
+            this.canvas.startDrawingTerritory();
+            const hint = document.getElementById('canvas-hint');
+            if (hint) {
+                hint.textContent = 'Click and drag to draw a territory rectangle -- Esc to cancel';
+                hint.classList.add('visible');
+            }
+        });
+        palette.appendChild(terrBtn);
     }
 
     _bindToolbar() {
@@ -105,15 +127,42 @@ class App {
             });
         });
         document.getElementById('btn-close-code').addEventListener('click', () => {
-            document.getElementById('code-panel').classList.remove('open');
+            const p = document.getElementById('code-panel');
+            p.classList.remove('open');
+            p.style.height = '';
         });
+
+        // Drag-to-resize code panel
+        const panel = document.getElementById('code-panel');
+        const handle = document.getElementById('code-resize-handle');
+        if (handle) {
+            let startY, startH;
+            handle.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                startY = e.clientY;
+                startH = panel.offsetHeight;
+                const onMove = (e2) => {
+                    const newH = Math.max(80, Math.min(600, startH + (startY - e2.clientY)));
+                    panel.style.height = newH + 'px';
+                };
+                const onUp = () => {
+                    window.removeEventListener('pointermove', onMove);
+                    window.removeEventListener('pointerup', onUp);
+                };
+                window.addEventListener('pointermove', onMove);
+                window.addEventListener('pointerup', onUp);
+            });
+        }
     }
 
     toggleCodePanel() {
         const panel = document.getElementById('code-panel');
         const isOpen = panel.classList.toggle('open');
         if (isOpen) {
+            panel.style.height = '';
             this.codegen.render(this.canvas.components);
+        } else {
+            panel.style.height = '';
         }
     }
 
@@ -138,7 +187,12 @@ class App {
         this.properties.show(comp);
 
         // If a component is selected, also show its connected bus info
-        document.getElementById('prop-panel').classList.toggle('has-selection', !!comp);
+        document.getElementById('prop-panel').classList.toggle('has-selection', !!(comp || this.canvas.selectedTerritoryId));
+    }
+
+    onTerritorySelected(terr) {
+        this.properties.showTerritory(terr);
+        document.getElementById('prop-panel').classList.toggle('has-selection', !!terr);
     }
 
     onPlacingDone() {
