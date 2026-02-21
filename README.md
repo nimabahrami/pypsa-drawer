@@ -44,15 +44,6 @@ npx serve .
 
 Then open [http://localhost:8080](http://localhost:8080) in your browser.
 
-### Deploy to GitHub Pages
-
-This project is fully static and ready for GitHub Pages deployment:
-
-1. Push to a GitHub repository
-2. Go to **Settings → Pages**
-3. Set source to **Deploy from a branch** → `main` / `root`
-4. Your app will be live at `https://<username>.github.io/<repo-name>/`
-
 ## Project Structure
 
 ```
@@ -67,10 +58,6 @@ This project is fully static and ready for GitHub Pages deployment:
     ├── export.js       # PNG export with legend
     └── history.js      # Undo/redo state management
 ```
-
-## Technology
-
-Pure HTML, CSS, and JavaScript — no frameworks, no build tools, no dependencies. Uses SVG for crisp, scalable rendering.
 
 ## License
 
