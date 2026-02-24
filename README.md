@@ -9,6 +9,7 @@ A browser-based visual editor for designing [PyPSA](https://pypsa.org/) energy s
 - **Property Editor** — Click any component to edit its PyPSA attributes (nominal power, efficiency, carrier, bus assignments, etc.)
 - **Carrier Management** — Define energy carriers (AC, DC, heat, hydrogen, etc.) with CO₂ emission parameters
 - **Code Generation** — Automatically generates PyPSA Python code with proper `n.add()` calls, one keyword argument per line
+- **Import Code** — Paste PyPSA Python code to automatically generate and lay out the schematic network
 - **PNG Export** — Export your network diagram as a high-resolution PNG with a component legend
 - **Undo/Redo** — Full history support for all editing operations
 - **Pan & Zoom** — Navigate large networks with mouse wheel zoom and drag-to-pan

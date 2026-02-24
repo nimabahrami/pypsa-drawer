@@ -283,9 +283,33 @@ export const COMPONENT_SYMBOLS = {
 let counters = {};
 export function resetCounters() { counters = {}; }
 export function autoName(type) {
-  if (!counters[type]) counters[type] = 0;
-  counters[type]++;
-  return `${type}_${counters[type]}`;
+  let maxNum = counters[type] || 0;
+  let existingNames = [];
+
+  if (window.app && window.app.canvas) {
+    const compsOfType = window.app.canvas.components.filter(c => c.type === type);
+    existingNames = window.app.canvas.components.map(c => c.data.name);
+
+    for (const c of compsOfType) {
+      const match = c.data.name.match(/(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) {
+          maxNum = num;
+        }
+      }
+    }
+  }
+
+  counters[type] = maxNum + 1;
+  let name = `${type}_${counters[type]}`;
+
+  while (existingNames.includes(name)) {
+    counters[type]++;
+    name = `${type}_${counters[type]}`;
+  }
+
+  return name;
 }
 
 // Create a new component instance with default values

@@ -6,6 +6,7 @@ import { PropertyEditor } from './properties.js';
 import { CodeGenerator } from './codegen.js';
 import { Exporter } from './export.js';
 import { History } from './history.js';
+import { parseAndImport } from './import.js';
 
 class App {
     constructor() {
@@ -105,7 +106,12 @@ class App {
         });
         document.getElementById('btn-center').addEventListener('click', () => this.canvas.centerView());
         document.getElementById('btn-export').addEventListener('click', () => this.exporter.exportPNG());
+        document.getElementById('btn-import-code').addEventListener('click', () => this.toggleImportModal(true));
         document.getElementById('btn-code').addEventListener('click', () => this.toggleCodePanel());
+
+        // Import modal events
+        document.getElementById('btn-close-import').addEventListener('click', () => this.toggleImportModal(false));
+        document.getElementById('btn-run-import').addEventListener('click', () => this.runImport());
 
         // Keyboard shortcuts
         window.addEventListener('keydown', (e) => {
@@ -113,6 +119,12 @@ class App {
                 e.preventDefault();
                 if (e.shiftKey) this.history.redo();
                 else this.history.undo();
+            }
+            if (e.key === 'Escape') {
+                const importModal = document.getElementById('import-modal');
+                if (importModal && importModal.classList.contains('open')) {
+                    this.toggleImportModal(false);
+                }
             }
         });
     }
@@ -163,6 +175,30 @@ class App {
             this.codegen.render(this.canvas.components);
         } else {
             panel.style.height = '';
+        }
+    }
+
+    toggleImportModal(show) {
+        const modal = document.getElementById('import-modal');
+        if (show) {
+            modal.classList.add('open');
+            document.getElementById('import-textarea').focus();
+        } else {
+            modal.classList.remove('open');
+        }
+    }
+
+    runImport() {
+        const code = document.getElementById('import-textarea').value;
+        if (!code.trim()) return;
+
+        try {
+            parseAndImport(code, this);
+            this.toggleImportModal(false);
+            document.getElementById('import-textarea').value = '';
+        } catch (err) {
+            alert('Error parsing PyPSA code:\n' + err.message);
+            console.error(err);
         }
     }
 

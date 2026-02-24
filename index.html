@@ -27,6 +27,7 @@
       <span id="comp-count">0 components</span>
       <div class="toolbar-sep"></div>
       <button class="toolbar-btn" id="btn-export" title="Export as PNG">PNG</button>
+      <button class="toolbar-btn" id="btn-import-code" title="Import PyPSA Code from Python">Import Code</button>
       <button class="toolbar-btn primary" id="btn-code" title="Generate PyPSA Code">{ } Code</button>
     </header>
 
@@ -58,6 +59,26 @@
         <pre id="code-output"></pre>
       </div>
     </div>
+  </div>
+
+  <!-- Import Code Modal -->
+  <div id="import-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Import PyPSA Python Code</h3>
+        <button class="toolbar-btn" id="btn-close-import">Close</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">Paste Python code containing <code>network.add(...)</code> statements to generate the
+          schematic.</p>
+        <textarea id="import-textarea"
+          placeholder="import pypsa&#10;n = pypsa.Network()&#10;n.add('Bus', 'My Bus')&#10;..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="toolbar-btn primary" id="btn-run-import">Generate Schematic</button>
+      </div>
+    </div>
+  </div>
   </div>
 
   <script type="module" src="js/app.js"></script>
