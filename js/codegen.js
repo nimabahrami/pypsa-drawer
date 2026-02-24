@@ -9,6 +9,7 @@ export class CodeGenerator {
     }
 
     generate(components) {
+        const v = this.app.networkVarName || 'n';
         let code = '';
 
         // Imports
@@ -18,8 +19,8 @@ export class CodeGenerator {
 
         // Create network
         code += '# Create network\n';
-        code += 'n = pypsa.Network()\n';
-        code += 'n.set_snapshots(range(24))  # Adjust as needed\n';
+        code += `${v} = pypsa.Network()\n`;
+        code += `${v}.set_snapshots(range(24))  # Adjust as needed\n`;
         code += '\n';
 
         // Collect carriers from Carrier components
@@ -28,7 +29,7 @@ export class CodeGenerator {
             code += '# --- Carriers ---\n';
             for (const comp of carriers) {
                 const args = this._buildArgs(comp);
-                code += `n.add(\n    "Carrier",\n    "${comp.data.name}",\n${args})\n`;
+                code += `${v}.add(\n    "Carrier",\n    "${comp.data.name}",\n${args})\n`;
             }
             code += '\n';
         }
@@ -56,9 +57,9 @@ export class CodeGenerator {
             for (const comp of items) {
                 const args = this._buildArgs(comp);
                 if (args) {
-                    code += `n.add(\n    "${type}",\n    "${comp.data.name}",\n${args})\n`;
+                    code += `${v}.add(\n    "${type}",\n    "${comp.data.name}",\n${args})\n`;
                 } else {
-                    code += `n.add("${type}", "${comp.data.name}")\n`;
+                    code += `${v}.add("${type}", "${comp.data.name}")\n`;
                 }
             }
             code += '\n';
@@ -66,8 +67,8 @@ export class CodeGenerator {
 
         // Footer
         code += '# --- Solve ---\n';
-        code += '# n.optimize(solver_name="highs")  # Uncomment to solve\n';
-        code += '# n.statistics()  # View results\n';
+        code += `# ${v}.optimize(solver_name="highs")  # Uncomment to solve\n`;
+        code += `# ${v}.statistics()  # View results\n`;
 
         return code;
     }

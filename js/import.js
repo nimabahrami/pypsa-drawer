@@ -12,9 +12,19 @@ export function parseAndImport(pyCode, app) {
         return commentIdx >= 0 ? line.slice(0, commentIdx) : line;
     }).join(' ');
 
-    // 2. Extract all n.add(...) matches
-    // This regex looks for: n.add( "Type", "Name" , <optional args> )
-    const regex = /n\.add\s*\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"](.*?)\)/g;
+    // 2. Detect network variable name from `xxx = pypsa.Network()`
+    const netVarMatch = cleanCode.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*pypsa\s*\.\s*Network\s*\(/);
+    if (!netVarMatch) {
+        throw new Error("Could not find a pypsa.Network() assignment (e.g. n = pypsa.Network()).");
+    }
+    const netVar = netVarMatch[1];
+
+    // Store the network variable name so code generation retains it
+    app.networkVarName = netVar;
+
+    // 3. Extract all <netVar>.add(...) matches using the detected variable name
+    const escaped = netVar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped + '\\.add\\s*\\(\\s*[\'"]([^\'"]+)[\'"]\\s*,\\s*[\'"]([^\'"]+)[\'"](.*?)\\)', 'g');
 
     let match;
     const componentsData = [];
@@ -28,7 +38,7 @@ export function parseAndImport(pyCode, app) {
     }
 
     if (componentsData.length === 0) {
-        throw new Error("No n.add(...) statements found in the code.");
+        throw new Error(`No ${netVar}.add(...) statements found in the code.`);
     }
 
     // Process each extracted component
@@ -43,8 +53,6 @@ export function parseAndImport(pyCode, app) {
 
         // Parse kwargs
         if (data.argsStr && data.argsStr.trim().length > 0) {
-            // Very simple kwarg parser: key=value
-            // E.g., , p_nom=1000, carrier='AC', bus='Bus 1'
             const kwargRegex = /([a-zA-Z0-9_]+)\s*=\s*([^,]+)/g;
             let kwMatch;
             while ((kwMatch = kwargRegex.exec(data.argsStr)) !== null) {
@@ -119,7 +127,6 @@ function autoLayout(components) {
     });
 
     // Attach 1-ports to buses
-    // Map buses to their attached components
     const attachedToBus = {};
     buses.forEach(b => attachedToBus[b.data.name] = []);
 
@@ -128,7 +135,6 @@ function autoLayout(components) {
         if (busName && attachedToBus[busName]) {
             attachedToBus[busName].push(comp);
         } else if (buses.length > 0) {
-            // Default to first bus if unattached or missing bus
             comp.data.bus = buses[0].data.name;
             attachedToBus[buses[0].data.name].push(comp);
         } else {
@@ -141,18 +147,16 @@ function autoLayout(components) {
         const attached = attachedToBus[bus.data.name];
         if (!attached || attached.length === 0) return;
 
-        // Place them above or below the bus
         const spacing = 40;
         const startX = bus.cx - ((attached.length - 1) * spacing) / 2;
 
         attached.forEach((comp, idx) => {
             comp.cx = startX + (idx * spacing);
-            // Alternate above and below
             comp.cy = bus.cy + ((idx % 2 === 0) ? -50 : 50);
         });
     });
 
-    // Branches can just be centered between their buses
+    // Branches centered between their buses
     branches.forEach(branch => {
         const def = COMPONENT_TYPES[branch.type];
         const bus0Name = branch.data[def.busKeys[0]];
